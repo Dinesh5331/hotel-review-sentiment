@@ -7,12 +7,15 @@ import pickle
 import re
 import nltk
 from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
 from database import SessionLocal, User, Review, hash_password
 
 try:
     nltk.data.find('corpora/stopwords')
+    nltk.data.find('corpora/wordnet')
 except LookupError:
     nltk.download('stopwords')
+    nltk.download('wordnet')
 
 class LoginRequest(BaseModel):
     email: EmailStr
@@ -45,34 +48,75 @@ def get_db():
 
 class ReviewPredictor:
     def __init__(self, model_path='saved_model'):
-        self.model = tf.keras.models.load_model(f'{model_path}/hotel_review_model.h5')
+        self.model = tf.keras.models.load_model(f'{model_path}/hotel_review_model_improved.h5')
         with open(f'{model_path}/tokenizer.pkl', 'rb') as handle:
             self.tokenizer = pickle.load(handle)
         with open(f'{model_path}/max_seq_length.pkl', 'rb') as handle:
             self.max_seq_length = pickle.load(handle)
-        negations = {"no", "not", "never", "n't"}
-        stopset = set(stopwords.words("english")) - negations
-        self.stopwords = stopset
+        with open(f'{model_path}/best_thresh.pkl', 'rb') as handle:
+            self.best_thresh = pickle.load(handle)
+        
+        self.lemmatizer = WordNetLemmatizer()
+        nltk_stopwords = set(stopwords.words("english"))
+        negations = {"no", "not", "never", "nor", "none", "nothing", "nowhere", "cannot", "n't", "cannot", "couldn't", "wouldn't", "shouldn't", "haven't", "hasn't", "hadn't", "don't", "doesn't", "didn't", "isn't", "aren't", "wasn't", "weren't", "won't", "wouldn't"}
+        self.stopwords_filtered = nltk_stopwords - negations
+
+        self.contractions = {
+            "n't": " not", "don't": "do not", "didn't": "did not", "isn't": "is not",
+            "can't": "can not", "won't": "will not", "it's": "it is", "i'm": "i am",
+            "they're": "they are", "we're": "we are", "you're": "you are", "i've": "i have",
+            "i'd": "i would", "i'll": "i will", "that's": "that is", "there's": "there is",
+            "wasn't": "was not", "weren't": "were not", "haven't": "have not",
+            "hasn't": "has not", "hadn't": "had not", "doesn't": "does not",
+            "couldn't": "could not", "wouldn't": "would not", "shouldn't": "should not"
+        }
+
+        self.emoji_map = {
+            "😞": " sad ", "😢": " sad ", "😭": " sad ", "😔": " sad ",
+            "😡": " angry ", "😠": " angry ", "🤬": " angry ",
+            "🙂": " happy ", "😊": " happy ", "😄": " happy ", "😃": " happy ", "😁": " happy ",
+            "😍": " love ", "❤️": " love ", "💕": " love ",
+            "🤢": " disgust ", "🤮": " disgust ", "😷": " sick ",
+            "😴": " tired ", "😫": " tired ", "😩": " tired "
+        }
+
+    def expand_contractions_and_emojis(self, text):
+        if not isinstance(text, str):
+            text = str(text)
+        text = text.lower()
+        for emo, rep in self.emoji_map.items():
+            text = text.replace(emo, rep)
+        for k, v in self.contractions.items():
+            text = text.replace(k, v)
+        return text
 
     def process_text(self, text):
-        text = text.lower()
-        text = re.sub(r"[^a-z0-9\s']", " ", text)
+        text = self.expand_contractions_and_emojis(text)
+        text = re.sub(r'http\S+', '', text)
         text = re.sub(r'\d+', ' ', text)
+        text = re.sub(r'[^\w\s]', ' ', text)
         words = text.split()
-        words = [w for w in words if w not in self.stopwords]
-        return ' '.join(words)
+        processed_words = []
+        for word in words:
+            if word not in self.stopwords_filtered:
+                lemma = self.lemmatizer.lemmatize(word)
+                processed_words.append(lemma)
+        return ' '.join(processed_words)
 
     def predict_sentiment(self, text):
         processed = self.process_text(text)
         seq = self.tokenizer.texts_to_sequences([processed])
         padded = tf.keras.preprocessing.sequence.pad_sequences(seq, maxlen=self.max_seq_length, padding='post')
-        pred = float(self.model.predict(padded, verbose=0)[0][0])
-        negative_prob = pred
-        positive_prob = 1.0 - pred
-        if positive_prob >= negative_prob:
-            return "POSITIVE", positive_prob
+        prob = float(self.model.predict(padded, verbose=0)[0][0])
+        
+        if prob > self.best_thresh:
+            sentiment = "POSITIVE"
+            confidence = prob
         else:
-            return "NEGATIVE", negative_prob
+            sentiment = "NEGATIVE"
+            confidence = 1.0 - prob
+            
+        return sentiment, confidence
 
 app = FastAPI()
 

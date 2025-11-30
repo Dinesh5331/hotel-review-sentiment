@@ -173,31 +173,7 @@ export default function HotelReview({ onLogout, userEmail }) {
             </div>
           )}
 
-          {result && (
-            <div style={{
-              marginBottom: '2rem',
-              padding: '1rem',
-              borderRadius: '10px',
-              backgroundColor: result.sentiment === 'POSITIVE' ? '#d1fae5' : '#fee2e2',
-              border: `2px solid ${result.sentiment === 'POSITIVE' ? '#10b981' : '#ef4444'}`
-            }}>
-              <p style={{
-                color: result.sentiment === 'POSITIVE' ? '#065f46' : '#991b1b',
-                fontWeight: '700',
-                marginBottom: '0.5rem',
-                fontSize: '1.1rem'
-              }}>
-                Sentiment: {result.sentiment}
-              </p>
-              <p style={{
-                color: result.sentiment === 'POSITIVE' ? '#047857' : '#dc2626',
-                fontSize: '0.95rem',
-                fontWeight: '500'
-              }}>
-                Confidence: {(result.confidence * 100).toFixed(2)}%
-              </p>
-            </div>
-          )}
+        
 
           <button
             onClick={handleSubmitReview}
