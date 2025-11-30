@@ -1,204 +1,228 @@
-Hotel Review Sentiment Analysis (React + FastAPI + TensorFlow)
+HOTEL REVIEW SENTIMENT ANALYSIS
 
-This project is a full-stack AI-powered sentiment analysis platform that allows users to:
+A full-stack AI-powered web application that analyzes hotel reviews to determine sentiment (Positive/Negative) using machine learning.
 
-Create an account
+========================================================================
+FEATURES
+========================================================================
 
-Log in securely
+USER AUTHENTICATION
 
-Submit hotel reviews
+    Secure Signup with email and password
 
-Get instant Positive / Negative sentiment predictions
+    Password Hashing using SHA-256
 
-View prediction confidence
+    Protected Login system
 
-Store user reviews in a SQLite database
+    Inline UI Messages - clean error/success notifications without pop-ups
 
-Interact through a clean React frontend
+AI SENTIMENT ANALYSIS
 
-Use a FastAPI + TensorFlow backend
+    TensorFlow GRU Model for accurate predictions
 
-⭐ Features
-🔐 User Authentication
+    Custom Text Preprocessing with tokenization and sequence padding
 
-Signup with email + password
+    Confidence Scoring for each prediction
 
-Password hashing (SHA-256)
+    Real-time Analysis with instant results
 
-Secure login
+DATABASE MANAGEMENT
 
-Inline UI error & success messages (no pop-up alerts)
+    SQLite Database with SQLAlchemy ORM
 
-🤖 AI Sentiment Analysis
+    User Management - store user accounts securely
 
-TensorFlow GRU model
+    Review History - save all analyzed reviews
 
-Tokenization + sequence padding
+    Prediction Storage - maintain historical data
 
-Custom text preprocessing
+MODERN USER INTERFACE
 
-Confidence score for each review
+    React + Vite frontend for fast performance
 
-🗄 Database (SQLite + SQLAlchemy)
+    Responsive Design works on all devices
 
-Saves users
+    Clean Interface with professional styling
 
-Saves reviews
+    Intuitive Navigation between pages
 
-Stores predictions for future usage
+========================================================================
+PROJECT STRUCTURE
+========================================================================
 
-🎨 Modern UI (React + Vite)
-
-Signup page
-
-Login page
-
-Review submission page
-
-Result display with confidence
-
-Smooth, professional interface
-
-📂 Project Structure
 GEN AI project/
 │
-├── README.md                     # Documentation for the project
+├── README.md
 │
-├── my-react-app/                 # Frontend (React + Vite)
-│   ├── src/
-│   │   ├── LoginPage.jsx
-│   │   ├── SignUp.jsx
-│   │   ├── HotelReview.jsx
-│   │   └── main.jsx
-│   ├── package.json
-│   └── ...
+├── my-react-app/ # Frontend (React + Vite)
+│ ├── src/
+│ │ ├── LoginPage.jsx
+│ │ ├── SignUp.jsx
+│ │ ├── HotelReview.jsx
+│ │ └── main.jsx
+│ ├── package.json
+│ └── ...
 │
-└── ml model/                     # Backend (FastAPI + TensorFlow + SQLite)
-    ├── predict_review.py         # API server
-    ├── database.py               # SQLAlchemy models & DB setup
-    ├── model.py                  # ML training script
-    ├── saved_model/              # Saved TensorFlow model + tokenizer
-    ├── users.db                  # SQLite database (auto-generated)
-    └── requirements.txt          # Backend Python dependencies
+└── ml model/ # Backend (FastAPI + TensorFlow + SQLite)
+├── predict_review.py # API server
+├── database.py # SQLAlchemy models & DB setup
+├── model.py # ML training script
+├── saved_model/ # Saved TensorFlow model + tokenizer
+│ ├── hotel_review_model.h5
+│ ├── tokenizer.pkl
+│ └── max_seq_length.pkl
+├── users.db # SQLite database (auto-generated)
+└── requirements.txt # Backend Python dependencies
 
-⚙️ Backend Setup (FastAPI + TensorFlow)
-1️⃣ Navigate to the backend folder
-cd "GEN AI project/ml model"
+========================================================================
+INSTALLATION & SETUP
+========================================================================
 
-2️⃣ Create a virtual environment
-python -m venv myenv
+BACKEND SETUP (FASTAPI + TENSORFLOW)
 
-3️⃣ Activate the environment
+    Navigate to the backend folder
+    cd "GEN AI project/ml model"
 
-Windows:
+    Create a virtual environment
+    python -m venv myenv
 
-myenv\Scripts\activate
+    Activate the environment
+    Windows: myenv\Scripts\activate
+    Mac/Linux: source myenv/bin/activate
 
+    Install dependencies
+    pip install -r requirements.txt
 
-Mac/Linux:
+    Start the FastAPI server
+    uvicorn predict_review:app --reload --host 0.0.0.0 --port 8000
 
-source myenv/bin/activate
+Backend will run on: http://localhost:8000
+API Documentation: http://localhost:8000/docs
 
-4️⃣ Install dependencies
-pip install -r requirements.txt
+FRONTEND SETUP (REACT + VITE)
 
-5️⃣ Start the FastAPI server
-uvicorn predict_review:app --reload --host 0.0.0.0 --port 8000
+    Open a new terminal
 
-Backend will run on:
+    Navigate to the frontend folder
+    cd "GEN AI project/my-react-app"
 
-http://localhost:8000
+    Install dependencies
+    npm install
 
-API Docs: http://localhost:8000/docs
+    Start the development server
+    npm run dev
 
-🎨 Frontend Setup (React + Vite)
-1️⃣ Open a new terminal
-2️⃣ Navigate to the frontend folder
-cd "GEN AI project/my-react-app"
+Frontend will run on: http://localhost:5173
 
-3️⃣ Install node modules
-npm install
+========================================================================
+MACHINE LEARNING MODEL
+========================================================================
 
-4️⃣ Start React development server
-npm run dev
+The sentiment analysis is powered by a sophisticated neural network:
 
-Frontend will run on:
+    Architecture: GRU-based neural network
 
-http://localhost:5173
+    Vocabulary: Tokenizer with top 10,000 words
 
-🤖 Machine Learning Model
+    Preprocessing: Custom stopword filtering and text cleaning
 
-The ML model was trained using:
+    Sequence Handling: Padding to max sequence length
 
-TensorFlow
+    Classification: Binary classification (Positive/Negative)
 
-GRU-based neural network
+Model Files:
 
-Tokenizer with top 10,000 words
+    hotel_review_model.h5 - Trained TensorFlow model
 
-Padding to max sequence length
+    tokenizer.pkl - Text tokenizer for preprocessing
 
-Custom stopword filtering
+    max_seq_length.pkl - Sequence length configuration
 
-Binary classification (Positive / Negative)
+========================================================================
+API ENDPOINTS
+========================================================================
 
-Model files saved in:
+AUTHENTICATION ENDPOINTS
 
-ml model/saved_model/
+    POST /signup - Create a new user account
 
+    POST /login - Authenticate user and generate session
 
-Files include:
+ANALYSIS ENDPOINTS
 
-hotel_review_model.h5
+    POST /analyze - Submit review text and receive sentiment analysis
 
-tokenizer.pkl
+========================================================================
+DATABASE SCHEMA
+========================================================================
 
-max_seq_length.pkl
+USERS TABLE
+Column	Type	Description
+id	Integer	Primary key
+email	String	User's email (unique)
+password	String	Hashed password
+created_at	DateTime	Account creation timestamp
 
-🌐 API Endpoints
-➤ POST /signup
+REVIEWS TABLE
+Column	Type	Description
+id	Integer	Primary key
+user_email	String	Associated user's email
+review_text	String	Original review text
+sentiment	String	Prediction result (Positive/Negative)
+confidence	Float	Model confidence score (0-1)
+created_at	DateTime	Analysis timestamp
 
-Create a new user
+========================================================================
+QUICK START
+========================================================================
 
-➤ POST /login
+RUNNING THE FULL PROJECT
 
-Verify email + password
+    Start the Backend:
+    cd "ml model"
+    myenv\Scripts\activate # Windows
+    source myenv/bin/activate # Mac/Linux
 
-➤ POST /analyze
+    pip install -r requirements.txt
+    uvicorn predict_review:app --reload --port 8000
 
-Submit review → receive sentiment + confidence
+    Start the Frontend:
+    cd "my-react-app"
+    npm install
+    npm run dev
 
-🗄 Database Structure
-users table
-Column	Type
-id	Integer
-email	String
-password	String
-created_at	DateTime
-reviews table
-Column	Type
-id	Integer
-user_email	String
-review_text	String
-sentiment	String
-confidence	Float
-created_at	DateTime
-🚀 How to Run Full Project (Summary)
-Backend:
-cd ml model
-myenv\Scripts\activate
-pip install -r requirements.txt
-uvicorn predict_review:app --reload --port 8000
+    Open your browser: http://localhost:5173
 
-Frontend:
-cd my-react-app
-npm install
-npm run dev
+========================================================================
+USAGE GUIDE
+========================================================================
 
+    Create an Account - Sign up with your email and password
 
-Then open:
-👉 http://localhost:5173
+    Login - Access your account securely
 
-📝 License
+    Submit Reviews - Enter hotel reviews in the text area
 
-MIT License — free to use.
+    Get Analysis - Receive instant sentiment predictions with confidence scores
+
+    View History - All your analyses are stored for future reference
+
+========================================================================
+TECHNOLOGY STACK
+========================================================================
+
+    Frontend: React, Vite, Modern CSS
+
+    Backend: FastAPI, Python
+
+    Machine Learning: TensorFlow, Keras, GRU Neural Networks
+
+    Database: SQLite with SQLAlchemy ORM
+
+    Authentication: SHA-256 Password Hashing
+
+========================================================================
+LICENSE
+========================================================================
+
+MIT License - feel free to use this project for personal or commercial purposes.
