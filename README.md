@@ -1,7 +1,8 @@
-
 # Resenas - Hotel Review Sentiment Analysis
 
 AI-powered hotel review sentiment analyzer with user authentication.
+
+
 
 ### 1. Backend Setup
 ```bash
@@ -18,7 +19,7 @@ source myenv/bin/activate       # Mac/Linux
 # Install dependencies
 pip install -r requirements.txt
 
-# Train the model 
+# Train the model (first time only - takes 10-20 mins)
 python model.py
 
 # Start backend server
@@ -49,24 +50,26 @@ Frontend runs at: `http://localhost:5173`
 4. Write a hotel review → Click **"Submit Review"**
 5. View sentiment analysis result (POSITIVE/NEGATIVE)
 
-## 🔧 Requirements
 
-- Python 3.8-3.11
-- Node.js 16+
-- npm
-
-
-GEN AI project/
-├── ml model/
+## 📁 Project Structure
+```
+GEN-AI-project/
+│
+├── ml-model/
 │   ├── model.py              # Train model
 │   ├── predict_review.py     # Backend API
 │   ├── database.py           # Database setup
-│   └── requirements.txt      # Python packages
+│   ├── requirements.txt      # Python packages
+│   ├── saved_model/          # Trained model files
+│   └── users.db              # SQLite database (auto-generated)
 │
 └── my-react-app/
     ├── src/
     │   ├── LoginPage.jsx     # Login page
     │   ├── SignUp.jsx        # Sign up page
-    │   └── HotelReview.jsx   # Review page
-    └── package.json          # Node packages
+    │   ├── HotelReview.jsx   # Review page
+    │   └── main.jsx          # App entry point
+    ├── package.json          # Node packages
+    └── vite.config.js        # Vite config
 ```
+**⚠️ Both servers must be running simultaneously for the app to work!**
